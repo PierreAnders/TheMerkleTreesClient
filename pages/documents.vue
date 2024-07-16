@@ -9,8 +9,8 @@
             <div class="mt-6 mb-24 text-white">
                 <div class="grid grid-cols-2 gap-10 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                     <div v-for="folder in folders" :key="folder.id" class="text-center"
-                        @touchstart="touchStart($event, folder.id)" @touchend="touchEnd($event)"
-                        @contextmenu.prevent="showContextMenu($event, folder.id)">
+                        @touchstart="touchStart($event, folder.name)" @touchend="touchEnd($event)"
+                        @contextmenu.prevent="showContextMenu($event, folder.name)">
                         <button @click="navigateToFolder(folder.name)"
                             class="flex flex-col items-center transition-transform transform hover:scale-105">
                             <ImageFolder class="mx-auto mb-1 w-22 h-22" />
@@ -42,7 +42,7 @@
 
                                 <button
                                     class="flex text-left text-sm py-1 rounded-sm hover:bg-[#D9D9D9] hover:bg-opacity-25"
-                                    @click="deleteFolder(contextMenu.folderId)">
+                                    @click="deleteFolder(contextMenu.folderName)">
                                     <div class="px-2">
                                         <IconSubmenuDeleteFolder class="w-5 h-5" :color="'#838383'" />
                                     </div>
@@ -89,22 +89,25 @@ export default {
             folderInfo: {
                 id: "",
                 name: "",
+                owner: "",
             },
             folders: [],
             isButtonClicked: false,
             contextMenu: {
                 isVisible: false,
-                folderId: null,
+                folderName: null,
+                x: 0,
+                y: 0
             },
         };
     },
 
     methods: {
         // Gestion du menu contextuel pour le mobile en restant longtemps appuyé sur un dossier
-        touchStart(event, folderId){
+        touchStart(event, folderName){
             // Si le toucher est maintenu pendant 700ms
             // On affiche le menu contextuel
-            this.touchTimeout = setTimeout( () => this.showContextMenu(event, folderId), 700)
+            this.touchTimeout = setTimeout(() => this.showContextMenu(event, folderName), 700)
         },
         // Sinon, on annule l'affichage du menu contextuel
         touchEnd(){
@@ -119,14 +122,14 @@ export default {
             }
         },
 
-        showContextMenu(event, folderId) {
+        showContextMenu(event, folderName) {
             event.preventDefault()
-            // Enregistrer l'ID du dossier sélectionné
-            this.contextMenu.folderId = folderId
+            // Enregistrer le nom du dossier sélectionné
+            this.contextMenu.folderName = folderName
 
             // Vérifier si l'option "Supprimer" a été sélectionnée
             if (event.target.textContent === "Supprimer") {
-                this.deleteFolder(folderId)
+                this.deleteFolder(folderName)
             } else {
                 // clientX : Coordonnée X du pointeur de la souris
                 this.contextMenu.x = event.clientX
@@ -152,7 +155,7 @@ export default {
                     Authorization: `Bearer ${token}`
                 };
 
-                const response = await axios.post(`${BASE_URL}/folders`, this.folderInfo, { headers })
+                const response = await axios.post(`${BASE_URL}/api/Categories`, this.folderInfo, { headers })
 
                 if (response.status === 201) {
                     console.log("Enregistrement d'une nouvelle categorie'.")
@@ -180,7 +183,7 @@ export default {
                     Authorization: `Bearer ${token}`
                 };
 
-                const response = await axios.get(`${BASE_URL}/folders`, { headers })
+                const response = await axios.get(`${BASE_URL}/api/Categories/user`, { headers })
 
                 if (response.status === 200) {
                     this.folders = response.data
@@ -204,7 +207,7 @@ export default {
             }
         },
 
-        async deleteFolder(folderId) {
+        async deleteFolder(folderName) {
             try {
                 const token = this.getJwtToken()
 
@@ -212,9 +215,9 @@ export default {
                     Authorization: `Bearer ${token}`,
                 };
 
-                const response = await axios.delete(`${BASE_URL}/folders/${folderId}`, { headers });
+                const response = await axios.delete(`${BASE_URL}/api/Categories/${folderName}`, { headers });
 
-                if (response.status === 200) {
+                if (response.status === 204) {
                     console.log("Categorie supprimée avec succès.")
                     this.getAllFolders()
                     this.contextMenu.isVisible = false
@@ -226,8 +229,8 @@ export default {
             }
         },
 
-        navigateToFolder(folderId) {
-            this.$router.push(`/folders/${folderId}`)
+        navigateToFolder(folderName) {
+            this.$router.push(`/folders/${folderName}`)
         },
 
         getJwtToken() {
@@ -255,11 +258,7 @@ export default {
 };
 </script>
     
-<style>
-body {
-    background-color: #111114;
-}
-
+<style scoped>
 .context-menu {
     position: absolute;
     left: 50%;
