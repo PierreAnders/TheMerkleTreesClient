@@ -18,18 +18,18 @@
           <span class="text-sm">{{ file.name }}</span>
         </div>
         <div class="flex justify-end mt-2 space-x-2 flex-nowrap md:mt-0">
-          <button @click="deleteFile(file)">
+          <button @click="deleteFile(file.name)">
             <IconSubmenuDeleteFolder
               :color="'#553348'"
               class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
             />
           </button>
-          <button @click="downloadFile(file)">
+          <button @click="downloadFile(file.name)">
             <IconDownload
               class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
             />
           </button>
-          <button @click="openFile(file)">
+          <button @click="openFile(file.name)">
             <IconOpen
               class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
             />
@@ -177,7 +177,7 @@ export default {
 
       axios
         .get(
-          `${BASE_URL}/folders/${this.folderName}/files/${fileName}`,
+          `${BASE_URL}/api/Files/decrypt/${fileName}`,
           axiosConfig
         )
         .then((response) => {
