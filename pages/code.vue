@@ -9,11 +9,11 @@
             <div class="flex justify-end w-full mx-auto mt-4 md:w-10/12">
                 <select class="px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray"
                     v-model="selectedModel">
-                    <option class="text-xs" value="gpt-4">gpt-4-1106-preview</option>
+                    <option class="text-xs" value="gpt-4-1106-preview">gpt-4-1106-preview</option>
                     <option class="text-xs" value="gpt-4">gpt-4</option>
-                    <option class="text-xs" value="gpt-4">gpt-4-32k</option>
+                    <option class="text-xs" value="gpt-4-32k">gpt-4-32k</option>
                     <option class="text-xs" value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                    <option class="text-xs" value="gpt-3.5-turbo">gpt-3.5-turbo-16k</option>
+                    <option class="text-xs" value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</option>
                 </select>
             </div>
             <div v-for="message in messages" :key="message.id"
@@ -42,6 +42,7 @@
 import axios from 'axios'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
+
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
 export default {
@@ -56,119 +57,98 @@ export default {
         }
     },
     methods: {
-        highlightCodeBlocks(text) {
-            // Regex pour récupérer le contenu entre les blocs de code
-            const regex = /```([^`]+)```/g;
-            // Remplacer le contenu entre les blocs de code par le contenu mis en forme par highlight.js
-            return text.replace(regex, (code) => {
-                // Récupérer le code mis en forme par highlight.js
-                const highlightedCode = hljs.highlightAuto(code).value;
-                return `<pre><code>${highlightedCode}</code></pre>`;
-            });
-        },
-        async sendMessage() {
-            // Vérification que le message n'est pas vide après avoir supprimé les espaces
-            if (this.userMessage.trim() === '') return;
+    highlightCodeBlocks(text) {
+        // Vérifiez si `text` est une chaîne de caractères
+        if (typeof text !== 'string') {
+            console.error('Expected a string but received:', text);
+            return text; // Retournez la valeur telle quelle si ce n'est pas une chaîne
+        }
 
-            this.jwtToken = localStorage.getItem('access_token')
-            const sessionId = this.jwtToken.slice(0, 90)
-            console.log('sessionId', sessionId)
-            this.isLoading = true
+        // Regex pour récupérer le contenu entre les blocs de code
+        const regex = /```([^`]+)```/g;
 
-            try {
-                const response = await axios.post(`${BASE_URL}/chat/${this.selectedModel}`, {
-                    session_id: sessionId,
-                    query: this.userMessage
-                }, {
-                    headers: {
-                        'Authorization': `Bearer ${this.jwtToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const assistantReply = response.data.answer;
-
-                // Ajouter le message de l'utilisateur et la réponse de l'assistant à la liste des messages.
-                this.messages.push(
-                    { role: 'user', content: this.userMessage },
-                    { role: 'assistant', content: assistantReply }
-                );
-
-                // Création d'un nouvel objet SpeechSynthesisUtterance pour la synthèse vocale.
-                const utterance = new SpeechSynthesisUtterance(assistantReply)
-
-                // Obtenir la liste des voix disponibles
-                const voices = speechSynthesis.getVoices()
-
-                // Choisir la deuxième voix de la liste
-                utterance.voice = voices[2]
-
-                // Accélerer la vitesse de lecture
-                utterance.rate = 1.5
-
-                // Envoyer le message à l'API SpeechSynthesis pour être lu à haute voix.
-                speechSynthesis.speak(utterance)
-
-                // Réinitialiser le message de l'utilisateur
-                this.userMessage = ''
-
-            } catch (error) {
-                console.error(`Erreur lors de l'envoi de la requête : ${error}`)
-
-            } finally {
-                this.isLoading = false
-            }
-        },
-        // Ne fonctionne pas sur Firefox (Pour Brave seulement si on active l'option)
-        async startSpeechRecognition() {
-            try {
-                // Vérification de la prise en charge de la reconnaissance vocale
-                if ('webkitSpeechRecognition' in window) {
-                    // Création d'une nouvelle instance de la reconnaissance vocale
-                    const recognition = new window.webkitSpeechRecognition()
-
-                    // Définition de la langue pour la reconnaissance vocale
-                    recognition.lang = 'fr-FR'
-
-                    // Lorsque la reconnaissance vocale démarre, on passe le statut de chargement à true
-                    recognition.onstart = () => {
-                        this.isLoading = true
-                    };
-
-                    // Lorsque la reconnaissance vocale récupère des résultats, on les affiche et on envoie le message
-                    recognition.onresult = (event) => {
-                        const speechResult = event.results[0][0].transcript
-                        this.userMessage = speechResult
-                        this.sendMessage()
-                    };
-
-                    // Gestion des erreurs de la reconnaissance vocale
-                    recognition.onerror = (event) => {
-                        console.error('Erreur de reconnaissance vocale', event.error)
-                        this.isLoading = false
-                    };
-
-                    // Une fois la reconnaissance vocale terminée, on passe le statut de chargement à false
-                    recognition.onend = () => {
-                        this.isLoading = false
-                    };
-
-                    // Lancement de la reconnaissance vocale
-                    recognition.start()
-                } else {
-                    // Appel de la fonction pour gérer l'erreur de non-prise en charge de reconnaissance vocale
-                    console.error('La reconnaissance vocale n\'est pas prise en charge dans ce navigateur.')
-                }
-            } catch (error) {
-                // Log des erreurs
-                console.error('Erreur lors de l\'initialisation de la reconnaissance vocale', error)
-            }
-        },
-        setup() {
-            definePageMeta({
-                middleware: ['auth'],
-            });
-        },
+        // Remplacer le contenu entre les blocs de code par le contenu mis en forme par highlight.js
+        return text.replace(regex, (match, code) => {
+            // Récupérer le code mis en forme par highlight.js
+            const highlightedCode = hljs.highlightAuto(code).value;
+            return `<pre><code>${highlightedCode}</code></pre>`;
+        });
     },
+    async sendMessage() {
+        if (this.userMessage.trim() === '') return;
+
+        this.jwtToken = localStorage.getItem('access_token')
+        const sessionId = this.jwtToken.slice(0, 90)
+        console.log('sessionId', sessionId)
+        this.isLoading = true
+
+        try {
+            const response = await axios.post(`${BASE_URL}/api/Chat/message`, {
+                message: this.userMessage
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('response', response.data)
+
+            const assistantReply = response.data.choices[0].message.content;
+            console.log('assistantReply', assistantReply)
+
+            this.messages.push(
+                { role: 'user', content: this.userMessage },
+                { role: 'assistant', content: assistantReply }
+            );
+
+            const utterance = new SpeechSynthesisUtterance(assistantReply)
+            const voices = speechSynthesis.getVoices()
+            utterance.voice = voices[2]
+            utterance.rate = 1.5
+            speechSynthesis.speak(utterance)
+
+            this.userMessage = ''
+
+        } catch (error) {
+            console.error(`Erreur lors de l'envoi de la requête : ${error}`)
+        } finally {
+            this.isLoading = false
+        }
+    },
+    async startSpeechRecognition() {
+        try {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new window.webkitSpeechRecognition()
+                recognition.lang = 'fr-FR'
+                recognition.onstart = () => {
+                    this.isLoading = true
+                };
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript
+                    this.userMessage = speechResult
+                    this.sendMessage()
+                };
+                recognition.onerror = (event) => {
+                    console.error('Erreur de reconnaissance vocale', event.error)
+                    this.isLoading = false
+                };
+                recognition.onend = () => {
+                    this.isLoading = false
+                };
+                recognition.start()
+            } else {
+                console.error('La reconnaissance vocale n\'est pas prise en charge dans ce navigateur.')
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'initialisation de la reconnaissance vocale', error)
+        }
+    },
+    setup() {
+        definePageMeta({
+            middleware: ['auth'],
+        });
+    },
+}
 }
 </script>

@@ -81,7 +81,7 @@ export default {
         const jwtToken = this.getJwtToken();
 
         axios
-          .get(`${BASE_URL}/api/Files/user`, {
+          .get(`${BASE_URL}/api/Files/user/category/${this.folderName}`, {
             headers: {
               Authorization: `Bearer ${jwtToken}`,
               "Content-Type": "application/json",
@@ -275,7 +275,7 @@ export default {
 
 
       formData.append("file", fileInput.files[0]);
-      formData.append("category", "default");
+      formData.append("category", this.folderName);
       formData.append("isPublic", true);
       formData.append("userAddress", "user-address");
 

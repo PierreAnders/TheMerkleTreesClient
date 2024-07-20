@@ -83,7 +83,7 @@ export default {
       this.isLoading = true
       console.log('this.selectedFolder', this.selectedFolder.name)
       try {
-        const response = await axios.post(`${BASE_URL}/chatWithData/${this.selectedModel}/${this.selectedFolder.name}`, {
+        const response = await axios.post(`${BASE_URL}/api/Chat/message`, {
           session_id: sessionId,
           query: this.userMessage,
           folder: this.selectedFolder
