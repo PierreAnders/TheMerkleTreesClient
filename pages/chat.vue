@@ -7,12 +7,12 @@
     </div>
     <div class="mt-12">
       <div class="flex justify-between w-full mx-auto mt-3 sm:10/12 md:w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12">
-        <div>
+        <!-- <div>
           <select v-model="selectedFolder"
             class="w-36 px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray">
             <option v-for="folder in userFolders" :key="folder" :value="folder">{{ folder.name }}</option>
           </select>
-        </div>
+        </div> -->  
         <div>
           <select class="w-36 px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray"
             v-model="selectedModel">
@@ -64,10 +64,10 @@ export default {
   },
 
   async mounted() {
-    await this.fetchUserFolders()
-    if (this.userFolders.length > 0) {
-      this.selectedFolder = this.userFolders[0];
-    }
+    // await this.fetchUserFolders()
+    // if (this.userFolders.length > 0) {
+    //   this.selectedFolder = this.userFolders[0];
+    // }
 
     this.jwtToken = localStorage.getItem('access_token')
   },
@@ -81,12 +81,10 @@ export default {
       const sessionId = this.jwtToken.slice(0, 120)
       console.log('sessionId', sessionId)
       this.isLoading = true
-      console.log('this.selectedFolder', this.selectedFolder.name)
+      // console.log('this.selectedFolder', this.selectedFolder.name)
       try {
         const response = await axios.post(`${BASE_URL}/api/Chat/message`, {
-          session_id: sessionId,
-          query: this.userMessage,
-          folder: this.selectedFolder
+        message: this.userMessage,
         }, {
           headers: {
             'Authorization': `Bearer ${this.jwtToken}`,
@@ -94,7 +92,7 @@ export default {
           }
         });
 
-        const assistantReply = response.data.answer;
+        const assistantReply = response.data.choices[0].message.content;
 
         // Ajouter le message de l'utilisateur et la réponse de l'assistant à la liste des messages.
         this.messages.push(
@@ -128,24 +126,24 @@ export default {
       }
     },
 
-    async fetchUserFolders() {
-      try {
-        this.jwtToken = localStorage.getItem('access_token')
-        const headers = { Authorization: `Bearer ${this.jwtToken}` };
+    // async fetchUserFolders() {
+    //   try {
+    //     this.jwtToken = localStorage.getItem('access_token')
+    //     const headers = { Authorization: `Bearer ${this.jwtToken}` };
 
-        const response = await axios.get(`${BASE_URL}/folders`, { headers });
+    //     const response = await axios.get(`${BASE_URL}/folders`, { headers });
 
-        if (response.status === 200) {
-          const userFolders = response.data;
-          this.userFolders = userFolders;
-          console.log('userFolders', userFolders)
-        } else {
-          console.error("Failed to retrieve user folders.");
-        }
-      } catch (error) {
-        console.error("Error fetching user folders:", error);
-      }
-    },
+    //     if (response.status === 200) {
+    //       const userFolders = response.data;
+    //       this.userFolders = userFolders;
+    //       console.log('userFolders', userFolders)
+    //     } else {
+    //       console.error("Failed to retrieve user folders.");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching user folders:", error);
+    //   }
+    // },
 
     async startSpeechRecognition() {
       try {

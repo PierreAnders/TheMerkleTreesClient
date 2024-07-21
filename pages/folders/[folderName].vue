@@ -278,6 +278,7 @@ export default {
       formData.append("category", this.folderName);
       formData.append("isPublic", true);
       formData.append("userAddress", "user-address");
+      console.log("formData", formData);
 
       axios
         .post(`${BASE_URL}/api/Files/upload`, formData, {
