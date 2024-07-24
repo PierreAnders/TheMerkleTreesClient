@@ -14,16 +14,12 @@ export default {
     initThreeJS() {
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 4000);
-      // camera.position.z = 1750;
-      camera.position.set(0, 0, 1500); // Ajuste ces valeurs selon le besoin
-
+      camera.position.set(0, 0, 1500);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
-
-      renderer.setClearColor(0x111114)
-      
+      renderer.setClearColor(0x111114);
       this.$refs.sceneContainer.appendChild(renderer.domElement);
 
       const controls = new OrbitControls(camera, renderer.domElement);
@@ -38,8 +34,8 @@ export default {
       const r = 800;
       const rHalf = r / 2;
 
-      const maxParticleCount = 1000;
-      let particleCount = 500;
+      const maxParticleCount = 350;
+      let particleCount = 0;  // Commence à 0
       const particlesData = [];
 
       const positions = new Float32Array(maxParticleCount * 3 * maxParticleCount);
@@ -56,23 +52,8 @@ export default {
       const particles = new THREE.BufferGeometry();
       const particlePositions = new Float32Array(maxParticleCount * 3);
 
-      for (let i = 0; i < maxParticleCount; i++) {
-        const x = Math.random() * r - rHalf;
-        const y = Math.random() * r - rHalf;
-        const z = Math.random() * r - rHalf;
-
-        particlePositions[i * 3] = x;
-        particlePositions[i * 3 + 1] = y;
-        particlePositions[i * 3 + 2] = z;
-
-        particlesData.push({
-          velocity: new THREE.Vector3(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2),
-          numConnections: 0
-        });
-      }
-
-      particles.setDrawRange(0, particleCount);
       particles.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3).setUsage(THREE.DynamicDrawUsage));
+      particles.setDrawRange(0, particleCount);
       const pointCloud = new THREE.Points(particles, pMaterial);
       group.add(pointCloud);
 
@@ -92,14 +73,43 @@ export default {
       const linesMesh = new THREE.LineSegments(geometry, material);
       group.add(linesMesh);
 
+      let frameCount = 0;
+
+      const addParticles = () => {
+        if (particleCount < maxParticleCount && frameCount % 10 === 0) {
+          const startIndex = particleCount * 3;
+          for (let i = particleCount; i < Math.min(particleCount + 5, maxParticleCount); i++) {
+            const x = Math.random() * r - rHalf;
+            const y = Math.random() * r - rHalf;
+            const z = Math.random() * r - rHalf;
+
+            particlePositions[i * 3] = x;
+            particlePositions[i * 3 + 1] = y;
+            particlePositions[i * 3 + 2] = z;
+
+            particlesData.push({
+              velocity: new THREE.Vector3(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2),
+              numConnections: 0
+            });
+          }
+          particleCount += 5;
+          particles.setDrawRange(0, particleCount);
+        }
+      };
+
       const animate = () => {
         requestAnimationFrame(animate);
+
+        addParticles();
 
         let vertexpos = 0;
         let colorpos = 0;
         let numConnected = 0;
 
         for (let i = 0; i < particleCount; i++) particlesData[i].numConnections = 0;
+
+        positions.fill(0);
+        colors.fill(0);
 
         for (let i = 0; i < particleCount; i++) {
           const particleData = particlesData[i];
@@ -159,6 +169,8 @@ export default {
 
         controls.update();
         renderer.render(scene, camera);
+
+        frameCount++;
       };
 
       animate();
@@ -173,10 +185,13 @@ export default {
 };
 </script>
 
+
+
+
 <style>
 .scene-container {
   width: 100%;
-  height: 100vh; /* Assure que le conteneur occupe toute la hauteur de la vue */
-  overflow: hidden; /* Évite le défilement si les éléments dépassent */
+  height: 100vh;
+  overflow: hidden;
 }
 </style>
