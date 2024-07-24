@@ -22,16 +22,20 @@
             <IconEnter class="transition-transform transform hover:scale-110" />
           </button>
         </div>
-        <div v-if="loginError" class="w-64 pb-3 text-sm text-white">
+        <div v-if="loginError" class="w-64 text-sm text-white">
           Mot de passe ou email incorrect
         </div>
       </div>
     </form>
+    <ClientOnly>
+      <MerkleAnimation />
+    </ClientOnly>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import MerkleAnimation from '~/components/MerkleAnimation.vue';
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
 export default {
