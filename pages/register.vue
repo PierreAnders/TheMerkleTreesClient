@@ -5,7 +5,7 @@
   <div class="min-h-screen px-8 pt-8">
     <BurgerMenu />
     <div
-      class="absolute top-60 left-1/2 transform -translate-x-1/2 z-0 bg-black bg-opacity-95 p-8 rounded-lg shadow-lg shadow-black">
+      class="absolute top-60 left-1/2 transform -translate-x-1/2 z-0 bg-black bg-opacity-85 p-8 rounded-lg shadow-lg shadow-black">
       <div class="flex items-center justify-center pt-8">
         <h1 class="pr-3 tracking-wider text-light-gray">INSCRIPTION</h1>
         <IconRegister :color="'#334155'" />
@@ -33,6 +33,9 @@
           </div>
         </div>
       </form>
+    </div>
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-0">
+      <img src="./../assets/images/logo-themerkletrees.svg" alt="" class="mx-auto flex items-center justify-center">
     </div>
   </div>
 </template>
