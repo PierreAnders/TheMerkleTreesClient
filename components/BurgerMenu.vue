@@ -7,10 +7,10 @@
             class="absolute top-0 left-0 z-10 w-1/2 h-full p-4 transition-transform duration-300 ease-in-out bg-dark-gray sm:w-1/2 md:w-1/3 lg:w-1/4 bg-opacity-85">
             <ul class="text-slate-400 mt-14">
                 <li>
-                    <nuxt-link to="/dashboard"
+                    <nuxt-link to="/home"
                         class="flex items-center px-4 transition duration-300 rounded hover:bg-black hover:text-white">
-                        <IconDashboard :color="'#838383'" class="mr-2" />
-                        <span class="block py-2 font-semibold tracking-wide text-light-gray">Dashboard</span>
+                        <IconHome :color="'#838383'" class="mr-2" />
+                        <span class="block py-2 font-semibold tracking-wide text-light-gray">Home</span>
                     </nuxt-link>
                 </li>
                 <li>
@@ -41,7 +41,7 @@
                         <span class="block py-2 font-semibold tracking-wide text-light-gray">Notes</span>
                     </nuxt-link>
                 </li>
-                <li>
+                <!-- <li>
                     <nuxt-link to="/finance-menu"
                         class="flex items-center px-4 transition duration-300 rounded hover:bg-black hover:text-white">
                         <IconFinance :color="'#838383'" class="mr-2" />
@@ -54,7 +54,7 @@
                         <IconHealth :color="'#838383'" class="mr-2" />
                         <span class="block py-2 font-semibold tracking-wide text-light-gray">Santé</span>
                     </nuxt-link>
-                </li>
+                </li> -->
                 <li>
                     <nuxt-link to="/profile"
                         class="flex items-center px-4 mb-12 transition duration-300 rounded hover:bg-black hover:text-white">

@@ -68,7 +68,7 @@ export default {
 
         console.log(BASE_URL);
         try {
-          const response = await axios.post(`${BASE_URL}/api/Auth/register`, {
+          const response = await axios.post(`https://urban-journey-p5v9qqxg9v6hwv5-5083.app.github.dev/api/Auth/register`, {
             email: this.email,
             password: this.password,
           });
