@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center p-2 cursor-pointer rounded transition-transform transform hover:scale-105" @click="navigate">
-      <img :src="favicon" alt="favicon" class="w-12 h-12 mb-2 rounded opacity-85" />
-      <span class="text-center text-sm text-light-gray">{{ title }}</span>
+      <img :src="favicon" alt="favicon" class="w-10 h-10 mb-2 rounded opacity-85" />
+      <span class="text-center text-xs text-light-gray">{{ title }}</span>
     </div>
   </template>
   
