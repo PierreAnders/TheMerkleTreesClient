@@ -52,6 +52,7 @@ export default {
   methods: {
     async login() {
       try {
+      console.log('url:', `${BASE_URL}`);
         console.log('Email:', this.email);
         console.log('Password:', this.password);
 
