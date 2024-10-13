@@ -7,6 +7,8 @@
       </h1>
       <IconFolder />
     </div>
+    <MetaMaskConnector @update-encryption-key="handleEncryptionKey"/>
+    <p class="text-light-gray">Clé de chiffrement parent: {{ encryptionKey }}</p>
     <ul class="flex flex-col w-3/4 mx-auto mt-12 mb-8 md:w-2/3 lg:w-1/2">
       <li
         v-for="file in fileList"
@@ -73,9 +75,14 @@ export default {
     return {
       fileList: [],
       folderName: "",
+      encryptionKey: null,
     };
   },
   methods: {
+    handleEncryptionKey(encryptionKey) {
+      this.encryptionKey = encryptionKey;
+      console.log("Encryption key received:", encryptionKey);
+    },
     loadFileList() {
       if (process.client) {
         const jwtToken = this.getJwtToken();

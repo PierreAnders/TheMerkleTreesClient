@@ -1,12 +1,21 @@
 <template>
   <div>
-    <button class="text-xs text-light-gray" @click="connectMetaMask">Connecter MetaMask</button>
+    <button class="text-xs text-light-gray" @click="connectMetaMask">
+      Connecter MetaMask
+    </button>
     <p class="text-xs text-light-gray" v-if="account">
       Compte connecté : {{ account }}
     </p>
-    <button class="text-xs text-light-gray" @click="generateEncryptionKey">Générer une clé de chiffrement</button>
-    <button class="text-xs text-light-gray" @click="fetchEncryptionKey">Récupérer la clé de chiffrement</button>
-    <p class="text-xs text-light-gray" v-if="encryptionKey">Clé de chiffrement : {{ encryptionKey }}</p>
+    <button class="text-xs text-light-gray" @click="generateEncryptionKey">
+      Générer une clé de chiffrement
+    </button>
+    <p class="text-xs text-light-gray">Ou</p>
+    <button class="text-xs text-light-gray" @click="fetchEncryptionKey">
+      Récupérer la clé de chiffrement
+    </button>
+    <p class="text-xs text-light-gray" v-if="encryptionKey">
+      Clé de chiffrement composant : {{ encryptionKey }}
+    </p>
   </div>
 </template>
 
@@ -23,9 +32,33 @@ export default {
     };
   },
   methods: {
+    emitEncryptionKey() {
+      this.$emit("update-encryption-key", this.encryptionKey);
+    },
+
+    // Méthode pour vérifier la connexion à MetaMask au chargement du composant
+    async checkMetaMaskConnection() {
+      if (window.ethereum) {
+        const web3 = new Web3(window.ethereum);
+        const accounts = await web3.eth.getAccounts();
+
+        if (accounts.length > 0) {
+          this.account = accounts[0];
+          console.log("Compte déjà connecté :", this.account);
+          this.initializeContract(web3); // Initialiser le contrat
+          await this.fetchEncryptionKey(); // Récupérer automatiquement la clé de chiffrement
+        } else {
+          console.log("MetaMask non connecté. Vous devez vous connecter.");
+        }
+      } else {
+        console.error("MetaMask n'est pas installé.");
+      }
+    },
+
     async connectMetaMask() {
       if (window.ethereum) {
         try {
+          // Demande de connexion à MetaMask
           await window.ethereum.request({ method: "eth_requestAccounts" });
           const web3 = new Web3(window.ethereum);
 
@@ -36,69 +69,74 @@ export default {
           this.account = accounts[0];
           console.log("Compte connecté :", this.account);
 
-          window.ethereum.on("chainChanged", (chainId) => {
-            console.log("Changement de réseau détecté :", chainId);
-          });
+          this.initializeContract(web3); // Initialiser le contrat
 
-          window.ethereum.on("accountsChanged", (accounts) => {
+          await this.fetchEncryptionKey(); // Récupérer la clé de chiffrement immédiatement
+
+          // Gérer les changements de compte et de réseau
+          window.ethereum.on("accountsChanged", async (accounts) => {
             console.log("Changement de compte détecté :", accounts);
             this.account = accounts[0];
+            await this.fetchEncryptionKey(); // Récupérer la clé à chaque changement de compte
           });
 
-          const contractABI = [
-            {
-              inputs: [],
-              name: "generateKey",
-              outputs: [],
-              stateMutability: "nonpayable",
-              type: "function",
-            },
-            {
-              anonymous: false,
-              inputs: [
-                {
-                  indexed: true,
-                  internalType: "address",
-                  name: "user",
-                  type: "address",
-                },
-                {
-                  indexed: false,
-                  internalType: "bytes32",
-                  name: "key",
-                  type: "bytes32",
-                },
-              ],
-              name: "KeyGenerated",
-              type: "event",
-            },
-            {
-              inputs: [],
-              name: "getKey",
-              outputs: [
-                {
-                  internalType: "bytes32",
-                  name: "",
-                  type: "bytes32",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-          ];
-
-          this.contract = new web3.eth.Contract(
-            contractABI,
-            "0xf657c05b903aa0a6f9af1704ccbfe0834d2193f6"
-          );
-
-          console.log("Contrat initialisé avec succès !");
+          window.ethereum.on("chainChanged", (chainId) => {
+            console.log("Changement de réseau détecté :", chainId);
+            window.location.reload(); // Recharger la page en cas de changement de réseau
+          });
         } catch (error) {
           console.error("Erreur lors de la connexion à MetaMask :", error);
         }
-      } else {
-        console.error("MetaMask n'est pas installé.");
       }
+    },
+
+    initializeContract(web3) {
+      const contractABI = [
+        {
+          inputs: [],
+          name: "generateKey",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "bytes32",
+              name: "key",
+              type: "bytes32",
+            },
+          ],
+          name: "KeyGenerated",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "getKey",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      this.contract = new web3.eth.Contract(
+        contractABI,
+        "0xf657c05b903aa0a6f9af1704ccbfe0834d2193f6"
+      );
     },
 
     async generateEncryptionKey() {
@@ -121,19 +159,8 @@ export default {
         return;
       }
 
-      console.log("Récupération de la clé de chiffrement...");
-      console.log("Contrat :", this.contract);
-      console.log("Compte :", this.account);
-
       try {
-        console.log("Appel à la fonction getKey...");
-
-        // Ajout d'un log avant et après l'appel pour capturer ce qui se passe
-        console.log("Avant l'appel à getKey()");
         const key = await this.contract.methods.getKey().call({ from: this.account });
-        console.log("Après l'appel à getKey(), résultat brut :", key);
-
-        // Vérification de la valeur récupérée
         if (key && key !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
           this.encryptionKey = key;
           console.log("Clé de chiffrement récupérée :", this.encryptionKey);
@@ -141,12 +168,15 @@ export default {
           console.error("Aucune clé générée ou clé invalide.");
         }
       } catch (error) {
-        // Capture des erreurs plus détaillée
-        console.error("Erreur lors de l'appel à getKey :", error);
-        console.error("Type de l'erreur :", error.name);
-        console.error("Message d'erreur :", error.message);
+        console.error("Erreur lors de la récupération de la clé de chiffrement :", error);
       }
+      this.emitEncryptionKey(); 
     },
+  },
+
+  // Appeler la méthode pour vérifier MetaMask dès que le composant est créé
+  created() {
+    this.checkMetaMaskConnection();
   },
 };
 </script>
