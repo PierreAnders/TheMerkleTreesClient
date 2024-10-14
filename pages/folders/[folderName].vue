@@ -272,17 +272,6 @@ export default {
       }
     },
 
-    // Méthode utilitaire pour convertir WordArray de CryptoJS en ArrayBuffer
-    wordArrayToArrayBuffer(wordArray) {
-      const arrayBuffer = new ArrayBuffer(wordArray.sigBytes);
-      const uint8Array = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < wordArray.sigBytes; i++) {
-        uint8Array[i] =
-          (wordArray.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-      }
-      return arrayBuffer;
-    },
-
     // Méthode pour obtenir le type MIME à partir de l'extension du fichier
     getMimeType(fileType) {
       switch (fileType) {
