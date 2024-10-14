@@ -153,6 +153,13 @@ export default {
       }
     },
 
+    hexToArrayBuffer(hexString) {
+      const byteArray = new Uint8Array(
+        hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      );
+      return byteArray.buffer;
+    },
+
     async fetchEncryptionKey() {
       if (!this.contract || !this.account) {
         console.error("Le contrat ou le compte n'est pas défini.");
@@ -160,17 +167,40 @@ export default {
       }
 
       try {
-        const key = await this.contract.methods.getKey().call({ from: this.account });
-        if (key && key !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-          this.encryptionKey = key;
-          console.log("Clé de chiffrement récupérée :", this.encryptionKey);
+        const key = await this.contract.methods
+          .getKey()
+          .call({ from: this.account });
+        if (
+          key &&
+          key !==
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ) {
+          const hexKey = key.substring(2);
+          const byteArray = this.hexToArrayBuffer(hexKey);
+
+          // Vérification de la longueur de la clé (doit être 16, 24 ou 32 octets)
+          if (
+            byteArray.byteLength === 16 ||
+            byteArray.byteLength === 24 ||
+            byteArray.byteLength === 32
+          ) {
+            this.encryptionKey = byteArray;
+            console.log("Clé de chiffrement récupérée :", this.encryptionKey);
+            this.emitEncryptionKey();
+          } else {
+            console.error(
+              "La clé de chiffrement doit avoir une longueur de 16, 24 ou 32 octets."
+            );
+          }
         } else {
           console.error("Aucune clé générée ou clé invalide.");
         }
       } catch (error) {
-        console.error("Erreur lors de la récupération de la clé de chiffrement :", error);
+        console.error(
+          "Erreur lors de la récupération de la clé de chiffrement :",
+          error
+        );
       }
-      this.emitEncryptionKey(); 
     },
   },
 
