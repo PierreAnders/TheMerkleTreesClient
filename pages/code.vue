@@ -57,98 +57,95 @@ export default {
         }
     },
     methods: {
-    highlightCodeBlocks(text) {
-        // Vérifiez si `text` est une chaîne de caractères
-        if (typeof text !== 'string') {
-            console.error('Expected a string but received:', text);
-            return text; // Retournez la valeur telle quelle si ce n'est pas une chaîne
-        }
-
-        // Regex pour récupérer le contenu entre les blocs de code
-        const regex = /```([^`]+)```/g;
-
-        // Remplacer le contenu entre les blocs de code par le contenu mis en forme par highlight.js
-        return text.replace(regex, (match, code) => {
-            // Récupérer le code mis en forme par highlight.js
-            const highlightedCode = hljs.highlightAuto(code).value;
-            return `<pre><code>${highlightedCode}</code></pre>`;
-        });
-    },
-    async sendMessage() {
-        if (this.userMessage.trim() === '') return;
-
-        this.jwtToken = localStorage.getItem('access_token')
-        const sessionId = this.jwtToken.slice(0, 90)
-        console.log('sessionId', sessionId)
-        this.isLoading = true
-
-        try {
-            const response = await axios.post(`${BASE_URL}/api/Chat/message`, {
-                message: this.userMessage
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${this.jwtToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            console.log('response', response.data)
-
-            const assistantReply = response.data.choices[0].message.content;
-            console.log('assistantReply', assistantReply)
-
-            this.messages.push(
-                { role: 'user', content: this.userMessage },
-                { role: 'assistant', content: assistantReply }
-            );
-
-            const utterance = new SpeechSynthesisUtterance(assistantReply)
-            const voices = speechSynthesis.getVoices()
-            utterance.voice = voices[2]
-            utterance.rate = 1.5
-            speechSynthesis.speak(utterance)
-
-            this.userMessage = ''
-
-        } catch (error) {
-            console.error(`Erreur lors de l'envoi de la requête : ${error}`)
-        } finally {
-            this.isLoading = false
-        }
-    },
-    async startSpeechRecognition() {
-        try {
-            if ('webkitSpeechRecognition' in window) {
-                const recognition = new window.webkitSpeechRecognition()
-                recognition.lang = 'fr-FR'
-                recognition.onstart = () => {
-                    this.isLoading = true
-                };
-                recognition.onresult = (event) => {
-                    const speechResult = event.results[0][0].transcript
-                    this.userMessage = speechResult
-                    this.sendMessage()
-                };
-                recognition.onerror = (event) => {
-                    console.error('Erreur de reconnaissance vocale', event.error)
-                    this.isLoading = false
-                };
-                recognition.onend = () => {
-                    this.isLoading = false
-                };
-                recognition.start()
-            } else {
-                console.error('La reconnaissance vocale n\'est pas prise en charge dans ce navigateur.')
+        highlightCodeBlocks(text) {
+            // Vérifiez si `text` est une chaîne de caractères
+            if (typeof text !== 'string') {
+                console.error('Expected a string but received:', text);
+                return text; // Retournez la valeur telle quelle si ce n'est pas une chaîne
             }
-        } catch (error) {
-            console.error('Erreur lors de l\'initialisation de la reconnaissance vocale', error)
-        }
-    },
-    setup() {
-        definePageMeta({
-            middleware: ['auth'],
-        });
-    },
-}
+
+            // Regex pour récupérer le contenu entre les blocs de code
+            const regex = /```([^`]+)```/g;
+
+            // Remplacer le contenu entre les blocs de code par le contenu mis en forme par highlight.js
+            return text.replace(regex, (match, code) => {
+                // Récupérer le code mis en forme par highlight.js
+                const highlightedCode = hljs.highlightAuto(code).value;
+                return `<pre><code>${highlightedCode}</code></pre>`;
+            });
+        },
+        async sendMessage() {
+            if (this.userMessage.trim() === '') return;
+
+            this.jwtToken = localStorage.getItem('access_token')
+            const sessionId = this.jwtToken.slice(0, 90)
+            console.log('sessionId', sessionId)
+            this.isLoading = true
+
+            try {
+                const response = await axios.post(`${BASE_URL}/api/Chat/message`, this.userMessage, {
+                    headers: {
+                        'Authorization': `Bearer ${this.jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const assistantReply = response.data.message.content;
+
+                console.log('assistantReply', assistantReply)
+
+                this.messages.push(
+                    { role: 'user', content: this.userMessage },
+                    { role: 'assistant', content: assistantReply }
+                );
+
+                const utterance = new SpeechSynthesisUtterance(assistantReply)
+                const voices = speechSynthesis.getVoices()
+                utterance.voice = voices[2]
+                utterance.rate = 1.5
+                speechSynthesis.speak(utterance)
+
+                this.userMessage = ''
+
+            } catch (error) {
+                console.error(`Erreur lors de l'envoi de la requête : ${error}`)
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async startSpeechRecognition() {
+            try {
+                if ('webkitSpeechRecognition' in window) {
+                    const recognition = new window.webkitSpeechRecognition()
+                    recognition.lang = 'en-US'
+                    recognition.onstart = () => {
+                        this.isLoading = true
+                    };
+                    recognition.onresult = (event) => {
+                        const speechResult = event.results[0][0].transcript
+                        this.userMessage = speechResult
+                        this.sendMessage()
+                    };
+                    recognition.onerror = (event) => {
+                        console.error('Erreur de reconnaissance vocale', event.error)
+                        this.isLoading = false
+                    };
+                    recognition.onend = () => {
+                        this.isLoading = false
+                    };
+                    recognition.start()
+                } else {
+                    console.error('La reconnaissance vocale n\'est pas prise en charge dans ce navigateur.')
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation de la reconnaissance vocale', error)
+            }
+        },
+        setup() {
+            definePageMeta({
+                middleware: ['auth'],
+            });
+        },
+    }
 }
 </script>
