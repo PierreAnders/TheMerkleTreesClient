@@ -70,6 +70,8 @@ export default {
     // }
 
     this.jwtToken = localStorage.getItem('access_token')
+
+    
   },
 
   methods: {
@@ -83,16 +85,14 @@ export default {
       this.isLoading = true
       // console.log('this.selectedFolder', this.selectedFolder.name)
       try {
-        const response = await axios.post(`${BASE_URL}/api/Chat/message`, {
-        message: this.userMessage,
-        }, {
+        const response = await axios.post(`${BASE_URL}/api/Chat/message`, { message: this.userMessage }, {
           headers: {
             'Authorization': `Bearer ${this.jwtToken}`,
             'Content-Type': 'application/json'
           }
         });
 
-        const assistantReply = response.data.choices[0].message.content;
+        const assistantReply = response.data.message.content;
 
         // Ajouter le message de l'utilisateur et la réponse de l'assistant à la liste des messages.
         this.messages.push(
@@ -110,7 +110,7 @@ export default {
         utterance.voice = voices[1]
 
         // Accélerer la vitesse de lecture
-        utterance.rate = 1.5
+        utterance.rate = 1
 
         // Envoyer le message à l'API SpeechSynthesis pour être lu à haute voix.
         speechSynthesis.speak(utterance)
@@ -125,25 +125,6 @@ export default {
         this.isLoading = false
       }
     },
-
-    // async fetchUserFolders() {
-    //   try {
-    //     this.jwtToken = localStorage.getItem('access_token')
-    //     const headers = { Authorization: `Bearer ${this.jwtToken}` };
-
-    //     const response = await axios.get(`${BASE_URL}/folders`, { headers });
-
-    //     if (response.status === 200) {
-    //       const userFolders = response.data;
-    //       this.userFolders = userFolders;
-    //       console.log('userFolders', userFolders)
-    //     } else {
-    //       console.error("Failed to retrieve user folders.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching user folders:", error);
-    //   }
-    // },
 
     async startSpeechRecognition() {
       try {
