@@ -70,6 +70,8 @@ export default {
     // }
 
     this.jwtToken = localStorage.getItem('access_token')
+
+    
   },
 
   methods: {
@@ -83,7 +85,7 @@ export default {
       this.isLoading = true
       // console.log('this.selectedFolder', this.selectedFolder.name)
       try {
-        const response = await axios.post(`${BASE_URL}/api/Chat/message`, this.userMessage, {
+        const response = await axios.post(`${BASE_URL}/api/Chat/message`, { message: this.userMessage }, {
           headers: {
             'Authorization': `Bearer ${this.jwtToken}`,
             'Content-Type': 'application/json'
@@ -108,7 +110,7 @@ export default {
         utterance.voice = voices[1]
 
         // Accélerer la vitesse de lecture
-        utterance.rate = 1.5
+        utterance.rate = 1
 
         // Envoyer le message à l'API SpeechSynthesis pour être lu à haute voix.
         speechSynthesis.speak(utterance)

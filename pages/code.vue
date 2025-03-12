@@ -83,11 +83,11 @@ export default {
             this.isLoading = true
 
             try {
-                const response = await axios.post(`${BASE_URL}/api/Chat/message`, this.userMessage, {
-                    headers: {
-                        'Authorization': `Bearer ${this.jwtToken}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await axios.post(`${BASE_URL}/api/Chat/message`, { message: this.userMessage }, {
+                headers: {
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                    'Content-Type': 'application/json'
+                }
                 });
 
                 const assistantReply = response.data.message.content;
@@ -102,7 +102,7 @@ export default {
                 const utterance = new SpeechSynthesisUtterance(assistantReply)
                 const voices = speechSynthesis.getVoices()
                 utterance.voice = voices[2]
-                utterance.rate = 1.5
+                utterance.rate = 1
                 speechSynthesis.speak(utterance)
 
                 this.userMessage = ''
