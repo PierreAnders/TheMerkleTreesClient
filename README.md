@@ -1,1 +1,1 @@
-
+The Merkle Trees frontend, built with Nuxt.js, provides a user-friendly interface for creating folders, uploading files, writing notes, and interacting with a local Large Language Model (LLM), all while leveraging decentralized storage capabilities.
