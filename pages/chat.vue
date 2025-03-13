@@ -12,25 +12,23 @@
             class="w-36 px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray">
             <option v-for="folder in userFolders" :key="folder" :value="folder">{{ folder.name }}</option>
           </select>
-        </div> -->  
+        </div> -->
         <div>
-          <select class="w-36 px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray"
-            v-model="selectedModel">
-            <option class="text-xs" value="gpt-4">gpt-4-1106-preview</option>
-            <option class="text-xs" value="gpt-4">gpt-4</option>
-            <option class="text-xs" value="gpt-4">gpt-4-32k</option>
-            <option class="text-xs" value="gpt-3.5-turbo">gpt-3.5-turbo-1106</option>
+          <select  v-model="selectedModel" class="w-36 px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray">
+            <option v-for="model in models" :key="model.value" :value="model.value" class="text-xs">
+              {{ model.label }}
+            </option>
           </select>
         </div>
       </div>
       <div v-for="message in messages" :key="message.id"
-        :class="[message.role === 'user' ? 'bg-blue-gray' : 'bg-light-gray text-black', 'p-2 rounded-md mt-4 mb-2 w-full sm:10/12 md:w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12 mx-auto']">
+           :class="[message.role === 'user' ? 'bg-blue-gray' : 'bg-light-gray text-black', 'p-2 rounded-md mt-4 mb-2 w-full sm:10/12 md:w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12 mx-auto']">
         {{ message.content }}
       </div>
       <div
-        class="flex items-center justify-between w-full mx-auto mt-4 input-container sm:10/12 md:w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12">
+          class="flex items-center justify-between w-full mx-auto mt-4 input-container sm:10/12 md:w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12">
         <textarea v-model="userMessage" placeholder="Posez une question..."
-          class="flex-1 p-2 border-2 border-black rounded-md focus:outline-none focus:border-light-gray bg-blue-gray"></textarea>
+                  class="flex-1 p-2 border-2 border-black rounded-md focus:outline-none focus:border-light-gray bg-blue-gray"></textarea>
       </div>
       <div class="flex justify-between w-full mx-auto mt-3 sm:10/12 md:w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12">
         <button @click="startSpeechRecognition">
@@ -56,10 +54,17 @@ export default {
       messages: [],
       userMessage: '',
       isLoading: false,
-      selectedModel: 'gpt-4',
       selectedFolder: null,
       userFolders: [],
       jwtToken: null,
+      models: [
+        { value: 'deepseek-r1:7b', label: 'DeepSeek R1 7B' },
+        { value: 'mistral', label: 'Mistral' },
+        { value: 'llama3', label: 'LLaMA 3' },
+        { value: 'codellama:7b', label: 'Code Llama 7B' },
+        { value: 'qwen:1.5', label: 'Qwen 1.5' }
+      ],
+      selectedModel: 'deepseek-r1:7b'
     }
   },
 
@@ -70,8 +75,6 @@ export default {
     // }
 
     this.jwtToken = localStorage.getItem('access_token')
-
-    
   },
 
   methods: {
@@ -85,7 +88,12 @@ export default {
       this.isLoading = true
       // console.log('this.selectedFolder', this.selectedFolder.name)
       try {
-        const response = await axios.post(`${BASE_URL}/api/Chat/message`, { message: this.userMessage }, {
+        const response = await axios.post(`${BASE_URL}/api/Chat/message`, 
+            { 
+              message: this.userMessage,
+              model: this.selectedModel,
+            }, 
+            {
           headers: {
             'Authorization': `Bearer ${this.jwtToken}`,
             'Content-Type': 'application/json'
@@ -96,8 +104,8 @@ export default {
 
         // Ajouter le message de l'utilisateur et la réponse de l'assistant à la liste des messages.
         this.messages.push(
-          { role: 'user', content: this.userMessage },
-          { role: 'assistant', content: assistantReply }
+            { role: 'user', content: this.userMessage },
+            { role: 'assistant', content: assistantReply }
         );
 
         // Création d'un nouvel objet SpeechSynthesisUtterance pour la synthèse vocale.
