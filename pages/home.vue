@@ -179,6 +179,7 @@ export default {
             } catch (error) {
                 console.error('Erreur lors de l\'ajout du raccourci:', error);
             }
+            this.fetchShortcuts();
         },
 
         async deleteShortcut(shortcutTitle) {

@@ -159,8 +159,6 @@ export default {
 
                 if (response.status === 201) {
                     console.log("Enregistrement d'une nouvelle categorie'.")
-                    this.getAllFolders()
-                    this.resetFolderInfo()
 
                 } else {
                     console.error("Échec de l'enregistrement d'une nouvelle categorie.")
@@ -169,6 +167,8 @@ export default {
             } catch (error) {
                 console.error("Erreur lors de la soumission d'une nouvelle categorie:", error)
             }
+            this.getAllFolders()
+            this.resetFolderInfo()
         },
 
         resetFolderInfo() {

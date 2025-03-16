@@ -1,7 +1,7 @@
 <template>
     <div class="text-center text-blue">
-      <div class="text-lg">{{ currentDate }}</div>
       <div class="text-xl font-semibold">{{ currentTime }}</div>
+      <div class="text-lg">{{ currentDate }}</div>
     </div>
   </template>
   

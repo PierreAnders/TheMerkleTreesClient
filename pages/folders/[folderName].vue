@@ -13,27 +13,29 @@
         :key="file.id"
         class="flex flex-col justify-between mt-6 text-white md:flex-row"
       >
-        <div class="flex space-x-2 wrap">
-          <IconDocument class="opacity-50" />
-          <span class="text-sm">{{ file.name }}</span>
-        </div>
-        <div class="flex justify-end mt-2 space-x-2 flex-nowrap md:mt-0">
-          <button @click="deleteFile(file.name)">
-            <IconSubmenuDeleteFolder
-              :color="'#553348'"
-              class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
-            />
-          </button>
-          <button @click="downloadFile(file.name)">
-            <IconDownload
-              class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
-            />
-          </button>
-          <button @click="openFile(file.name)">
-            <IconOpen
-              class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
-            />
-          </button>
+        <div class="flex justify-between w-full">
+          <div class="flex items-center space-x-2">
+            <IconDocument :color="'#828282'" iclass="opacity-50" />
+            <span class="text-sm">{{ file.name }}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button @click="deleteFile(file.name)">
+              <IconSubmenuDeleteFolder
+          :color="'#553348'"
+          class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
+              />
+            </button>
+            <button @click="downloadFile(file.name)">
+              <IconDownload
+          class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
+              />
+            </button>
+            <button @click="openFile(file.name)">
+              <IconOpen
+          class="w-5 h-5 transition-transform transform md:w-6 md:h-6 hover:scale-110"
+              />
+            </button>
+          </div>
         </div>
       </li>
     </ul>
@@ -52,7 +54,7 @@
             type="file"
             id="fileInput"
             ref="fileInput"
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.md,.html,.mp3,.mp4,.png,.jpg,.jpeg,.gif,mpeg,.webm,.ogg,.wav,.flac,.mp3,.mp4,.avi,.mov,.wmv,.mkv,.flv,.webm,.ogg,.wav,.flac,.mp3,.mp4,.avi,.mov"
             class="p-2 border rounded-md bg-neutral-300 text-neutral-800 focus:outline-none focus:border-amber-800"
             @change="uploadFile"
             style="display: none"

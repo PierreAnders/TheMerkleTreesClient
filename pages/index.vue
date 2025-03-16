@@ -62,7 +62,7 @@ export default {
 
         if (response.data && response.data.access_token) {
           localStorage.setItem('access_token', response.data.access_token);
-          this.$router.push('/documents');
+          this.$router.push('/home');
         } else {
           this.loginError = true;
           console.error('Échec de l\'authentification');
