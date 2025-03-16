@@ -60,6 +60,10 @@
             style="display: none"
           />
         </label>
+        <div>
+          <input type="checkbox" class="mr-2" name="isPublic" id="isPublic" v-model="isPublic"/>
+          <label for="isPublic" class="text-light-gray">Public</label>
+        </div>
       </div>
     </div>
   </div>
@@ -75,6 +79,7 @@ export default {
     return {
       fileList: [],
       folderName: "",
+      isPublic: false,
     };
   },
   methods: {
@@ -278,7 +283,7 @@ export default {
 
       formData.append("file", fileInput.files[0]);
       formData.append("category", this.folderName);
-      formData.append("isPublic", true);
+      formData.append("isPublic", this.isPublic);
       formData.append("userAddress", "user-address");
       console.log("formData", formData);
 
