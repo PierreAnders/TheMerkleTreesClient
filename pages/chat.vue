@@ -58,11 +58,11 @@ export default {
       userFolders: [],
       jwtToken: null,
       models: [
-        { value: 'deepseek-r1:7b', label: 'DeepSeek R1 7B' },
+        { value: 'deepseek-r1:7b', label: 'DeepSeek R1' },
         { value: 'mistral', label: 'Mistral' },
         { value: 'llama3', label: 'LLaMA 3' },
-        { value: 'codellama:7b', label: 'Code Llama 7B' },
-        { value: 'qwen:1.5', label: 'Qwen 1.5' }
+        { value: 'codellama', label: 'Code Llama' },
+        { value: 'qwen', label: 'Qwen' }
       ],
       selectedModel: 'deepseek-r1:7b'
     }
