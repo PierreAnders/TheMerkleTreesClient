@@ -1,6 +1,6 @@
 <template>
   <ClientOnly>
-    <MerkleAnimationCrop />
+    <MerkleAnimation />
   </ClientOnly>
   <div class="min-h-screen px-8 pt-8">
     <BurgerMenu />

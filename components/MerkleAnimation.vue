@@ -32,7 +32,7 @@ const initThreeJS = () => {
   const r = 800;
   const rHalf = r / 2;
 
-  const maxParticleCount = 300;
+  const maxParticleCount = 110;
   let particleCount = 0;
   const particlesData = [];
 
@@ -165,7 +165,7 @@ const initThreeJS = () => {
 
     pointCloud.geometry.attributes.position.needsUpdate = true;
 
-    const rotationSpeed = 0.005;
+    const rotationSpeed = 0.001;
     group.rotation.y += rotationSpeed;
 
     // controls.update();
