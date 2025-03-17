@@ -7,13 +7,10 @@
         </div>
         <div class="mt-12">
             <div class="flex justify-end w-full mx-auto mt-4 md:w-10/12">
-                <select class="px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray"
-                    v-model="selectedModel">
-                    <option class="text-xs" value="gpt-4-1106-preview">gpt-4-1106-preview</option>
-                    <option class="text-xs" value="gpt-4">gpt-4</option>
-                    <option class="text-xs" value="gpt-4-32k">gpt-4-32k</option>
-                    <option class="text-xs" value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                    <option class="text-xs" value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</option>
+                <select v-model="selectedModel" class="w-36 px-2 py-0.5 text-xs bg-black border rounded-md text-light-gray border-light-gray">
+                    <option v-for="model in models" :key="model.value" :value="model.value" class="text-xs">
+                        {{ model.label }}
+                    </option>
                 </select>
             </div>
             <div v-for="message in messages" :key="message.id"
@@ -53,7 +50,14 @@ export default {
             isListening: false,
             jwtToken: null,
             isLoading: false,
-            selectedModel: 'gpt-4'
+            models: [
+            { value: 'deepseek-r1:7b', label: 'DeepSeek R1' },
+            { value: 'mistral', label: 'Mistral' },
+            { value: 'llama3', label: 'LLaMA 3' },
+            { value: 'codellama', label: 'Code Llama' },
+            { value: 'qwen', label: 'Qwen' }
+            ],
+            selectedModel: 'deepseek-r1:7b'
         }
     },
     methods: {
@@ -83,7 +87,10 @@ export default {
             this.isLoading = true
 
             try {
-                const response = await axios.post(`${BASE_URL}/api/Chat/message`, { message: this.userMessage }, {
+                const response = await axios.post(`${BASE_URL}/api/Chat/message`, { 
+                    message: this.userMessage,
+                    model: this.selectedModel },
+                    {
                 headers: {
                     'Authorization': `Bearer ${this.jwtToken}`,
                     'Content-Type': 'application/json'

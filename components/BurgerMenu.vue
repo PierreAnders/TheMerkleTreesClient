@@ -4,7 +4,7 @@
             <IconMenu class="transition-transform transform hover:scale-110" />
         </button>
         <div v-if="isOpen"
-            class="absolute top-0 left-0 z-10 w-1/2 h-full p-4 transition-transform duration-300 ease-in-out bg-dark-gray sm:w-1/2 md:w-1/3 lg:w-1/4 bg-opacity-85">
+            class="background absolute top-0 left-0 z-10 w-1/2 h-full p-4 transition-transform duration-300 ease-in-out bg-dark-gray/90 sm:w-1/2 md:w-1/3 lg:w-1/4">
             <ul class="text-slate-400 mt-14">
                 <li>
                     <nuxt-link to="/home"
@@ -132,7 +132,7 @@ export default {
             this.isOpen = !this.isOpen;
         },
         closeMenuOnClickOutside(event) {
-            const menuElement = this.$el.querySelector(".bg-dark-gray");
+            const menuElement = this.$el.querySelector(".background");
             const buttonElement = this.$el.querySelector("button");
 
             if (menuElement && buttonElement && !menuElement.contains(event.target) && !buttonElement.contains(event.target)) {

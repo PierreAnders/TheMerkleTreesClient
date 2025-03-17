@@ -48,6 +48,8 @@ export default {
                     'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks',
                     'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
                 ],
+                skin: "oxide-dark",
+                content_css: "dark",
                 toolbar:
                     'undo redo | casechange blocks | bold italic backcolor | \
                                                                 alignleft aligncenter alignright alignjustify | \
