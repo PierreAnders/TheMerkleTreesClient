@@ -52,9 +52,6 @@ export default {
   methods: {
     async login() {
       try {
-        console.log('Email:', this.email);
-        console.log('Password:', this.password);
-
         const response = await axios.post(`${BASE_URL}/api/Auth/login`, {
           email: this.email,
           password: this.password

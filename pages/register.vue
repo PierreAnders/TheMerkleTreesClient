@@ -63,10 +63,6 @@ export default {
           console.error("Mot de passe non valide");
           return;
         }
-        console.log("Email:", this.email);
-        console.log("Password:", this.password);
-
-        console.log(BASE_URL);
         try {
           const response = await axios.post(`${BASE_URL}/api/Auth/register`, {
             email: this.email,
