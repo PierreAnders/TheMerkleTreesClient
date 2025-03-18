@@ -44,3 +44,16 @@
 ::-webkit-scrollbar-thumb:hover {
     background-color: #5D697A;
 }
+
+/* Ajoutez des tailles spécifiques */
+.ProseMirror h1 {
+    @apply text-4xl;
+}
+
+.ProseMirror h2 {
+    @apply text-3xl;
+}
+
+.ProseMirror h3 {
+    @apply text-2xl;
+}
